@@ -87,7 +87,15 @@ document.getElementById("feedbackForm").addEventListener("submit", async (e) => 
             name: nameInput,
             email: emailInput,
         });
-
+const firebaseConfig = {
+  apiKey: "AIzaSyDeTACUBfB-XWhgtTtYqwavqHOkPcvLvTM",
+  authDomain: "krillex-a57aa.firebaseapp.com",
+  projectId: "krillex-a57aa",
+  storageBucket: "krillex-a57aa.firebasestorage.app",
+  messagingSenderId: "559983149303",
+  appId: "1:559983149303:web:18d360a1775d3a81e4d3f2",
+  measurementId: "G-HKR3DZYVD8"
+};
        // Инициализация
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
