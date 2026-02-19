@@ -56,25 +56,24 @@
 
 <script type="module">
 
-// Импортируем модули Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-// Твои ключи Firebase
+// ТВОЙ Firebase проект
 const firebaseConfig = {
-    apiKey: "AIzaSyD67B_y0vDzgvqmYH3D1H1EESSSvQ7",
-    authDomain: "web-68557.firebaseapp.com",
-    projectId: "web-68557",
-    storageBucket: "web-68557.firebasestorage.app",
-    messagingSenderId: "675829681771",
-    appId: "1:675829681771:web:2364e1a0087516714d1ee"
+  apiKey: "AIzaSyDeTACUBfB-XWhgtTtYqwavqHOkPcvLvTM",
+  authDomain: "krillex-a57aa.firebaseapp.com",
+  projectId: "krillex-a57aa",
+  storageBucket: "krillex-a57aa.firebasestorage.app",
+  messagingSenderId: "559983149303",
+  appId: "1:559983149303:web:18d360a1775d3a81e4d3f2"
 };
 
-// Инициализация
+// Инициализация (ОДИН РАЗ)
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Логика кнопки
+// Обработчик формы (ОДИН РАЗ)
 document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -82,46 +81,22 @@ document.getElementById("feedbackForm").addEventListener("submit", async (e) => 
     const emailInput = document.getElementById("userEmail").value;
 
     try {
-        // Запись в коллекцию "requests"
         await addDoc(collection(db, "requests"), {
             name: nameInput,
             email: emailInput,
+            timestamp: new Date()
         });
-const firebaseConfig = {
-  apiKey: "AIzaSyDeTACUBfB-XWhgtTtYqwavqHOkPcvLvTM",
-  authDomain: "krillex-a57aa.firebaseapp.com",
-  projectId: "krillex-a57aa",
-  storageBucket: "krillex-a57aa.firebasestorage.app",
-  messagingSenderId: "559983149303",
-  appId: "1:559983149303:web:18d360a1775d3a81e4d3f2",
-  measurementId: "G-HKR3DZYVD8"
-};
-       // Инициализация
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
 
-    // Логика кнопки
-    document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
+        alert("Данные успешно отправлены!");
+        document.getElementById("feedbackForm").reset();
 
-        const nameInput = document.getElementById("userName").value;
-        const emailInput = document.getElementById("userEmail").value;
+    } catch (error) {
+        console.error("Ошибка:", error);
+        alert("Ошибка отправки. Проверь консоль (F12).");
+    }
+});
 
-        try {
-            // Запись в коллекцию "requests"
-            await addDoc(collection(db, "requests"), {
-                name: nameInput,
-                email: emailInput,
-                timestamp: new Date()
-            });
-
-            alert("Готово! Данные сохранены в Firebase.");
-            document.getElementById("feedbackForm").reset();
-        } catch (error) {
-            console.error("Ошибка записи: ", error);
-            alert("Ошибка при отправке.");
-        }
-    });
 </script>
+
 </body>
 </html>
