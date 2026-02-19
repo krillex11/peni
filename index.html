@@ -54,12 +54,12 @@
 
 <script type="module">
 
-// Импортируем модули Firebase
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import { getFirestore, collection, addDoc } 
 from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-// Твои ключи Firebase
+
 const firebaseConfig = {
     apiKey: "AIzaSyD67B...YOUR_KEY...",
     authDomain: "web-68557.firebaseapp.com",
@@ -69,11 +69,11 @@ const firebaseConfig = {
     appId: "1:675829681771:web:2364a1b0087516714d1ee"
 };
 
-// Инициализация
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Логика кнопки
+
 document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -81,7 +81,7 @@ document.getElementById("feedbackForm").addEventListener("submit", async (e) => 
     const emailInput = document.getElementById("userEmail").value;
 
     try {
-        // Запись в коллекцию "requests"
+       
         await addDoc(collection(db, "requests"), {
             name: nameInput,
             email: emailInput,
@@ -89,11 +89,11 @@ document.getElementById("feedbackForm").addEventListener("submit", async (e) => 
         });
 
       <script>
-    // Инициализация
+  
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Логика кнопки
+   
     document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
         e.preventDefault();
 
@@ -101,7 +101,7 @@ document.getElementById("feedbackForm").addEventListener("submit", async (e) => 
         const emailInput = document.getElementById("userEmail").value;
 
         try {
-            // Запись в коллекцию "requests"
+  
             await addDoc(collection(db, "requests"), {
                 name: nameInput,
                 email: emailInput,
