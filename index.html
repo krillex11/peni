@@ -2,44 +2,42 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Мой облачный проект</title>
+    <title>Firebase проект</title>
     <style>
-        body { 
-            font-family: sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            padding: 50px; 
-            background-color: #f4f4f9; 
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 50px;
+            background-color: #f4f4f9;
         }
-
-        .form-container { 
-            background: white; 
-            padding: 20px; 
-            border-radius: 10px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
-            width: 300px; 
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 300px;
         }
-
-        input { 
-            width: 100%; 
-            padding: 10px; 
-            margin-bottom: 15px; 
-            border: 1px solid #ccc; 
-            border-radius: 5px; 
-            box-sizing: border-box; 
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
         }
-
-        button { 
-            background: #4f46e5; 
-            border: none; 
-            color: white; 
-            font-weight: bold; 
-            cursor: pointer; 
-            border-radius: 5px; 
+        button {
+            background: #4f46e5;
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            padding: 10px;
+            width: 100%;
         }
-
-        button:hover { 
-            background: #4338ca; 
+        button:hover {
+            background: #4338ca;
         }
     </style>
 </head>
@@ -56,24 +54,26 @@
 
 <script type="module">
 
+// Импортируем модули Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc } 
+from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-// ТВОЙ Firebase проект
+// Твои ключи Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyDeTACUBfB-XWhgtTtYqwavqHOkPcvLvTM",
-  authDomain: "krillex-a57aa.firebaseapp.com",
-  projectId: "krillex-a57aa",
-  storageBucket: "krillex-a57aa.firebasestorage.app",
-  messagingSenderId: "559983149303",
-  appId: "1:559983149303:web:18d360a1775d3a81e4d3f2"
+    apiKey: "AIzaSyD67B...YOUR_KEY...",
+    authDomain: "web-68557.firebaseapp.com",
+    projectId: "web-68557",
+    storageBucket: "web-68557.appspot.com",
+    messagingSenderId: "675829681771",
+    appId: "1:675829681771:web:2364a1b0087516714d1ee"
 };
 
-// Инициализация (ОДИН РАЗ)
+// Инициализация
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Обработчик формы (ОДИН РАЗ)
+// Логика кнопки
 document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -81,22 +81,41 @@ document.getElementById("feedbackForm").addEventListener("submit", async (e) => 
     const emailInput = document.getElementById("userEmail").value;
 
     try {
+        // Запись в коллекцию "requests"
         await addDoc(collection(db, "requests"), {
             name: nameInput,
             email: emailInput,
-            timestamp: new Date()
+            createdAt: new Date()
         });
 
-        alert("Данные успешно отправлены!");
-        document.getElementById("feedbackForm").reset();
+      <script>
+    // Инициализация
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    } catch (error) {
-        console.error("Ошибка:", error);
-        alert("Ошибка отправки. Проверь консоль (F12).");
-    }
-});
+    // Логика кнопки
+    document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
 
+        const nameInput = document.getElementById("userName").value;
+        const emailInput = document.getElementById("userEmail").value;
+
+        try {
+            // Запись в коллекцию "requests"
+            await addDoc(collection(db, "requests"), {
+                name: nameInput,
+                email: emailInput,
+                timestamp: new Date()
+            });
+
+            alert("Готово! Данные сохранены в Firebase.");
+            document.getElementById("feedbackForm").reset();
+        } catch (error) {
+            console.error("Ошибка записи: ", error);
+            alert("Ошибка при отправке.");
+        }
+    });
 </script>
-
 </body>
 </html>
+
