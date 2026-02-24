@@ -40,17 +40,6 @@
             background: #4338ca;
         }
     </style>
-    <script>
-        const firebaseConfig = {
-  apiKey: "AIzaSyAe3wXHHBp8IgWs2JOntVbpWGpMrgr8O14",
-  authDomain: "nnnn-68466.firebaseapp.com",
-  projectId: "nnnn-68466",
-  storageBucket: "nnnn-68466.firebasestorage.app",
-  messagingSenderId: "428383704835",
-  appId: "1:428383704835:web:8150208bf3a676bc823b36",
-  measurementId: "G-326S3VW9PC"
-};
-    </script>
 </head>
 <body>
 
@@ -66,24 +55,24 @@
 <script type="module">
 
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getFirestore, collection, addDoc } 
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
 from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 
-const firebaseConfig = {
-    apiKey: "AIzaSyD67B...YOUR_KEY...",
-    authDomain: "web-68557.firebaseapp.com",
-    projectId: "web-68557",
-    storageBucket: "web-68557.appspot.com",
-    messagingSenderId: "675829681771",
-    appId: "1:675829681771:web:2364a1b0087516714d1ee"
+     const firebaseConfig = {
+  apiKey: "AIzaSyAe3wXHHBp8IgWs2JOntVbpWGpMrgr8O14",
+  authDomain: "nnnn-68466.firebaseapp.com",
+  projectId: "nnnn-68466",
+  storageBucket: "nnnn-68466.firebasestorage.app",
+  messagingSenderId: "428383704835",
+  appId: "1:428383704835:web:8150208bf3a676bc823b36",
+  measurementId: "G-326S3VW9PC"
 };
 
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
+const analytics = getAnalytics(app);
 
 document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
     e.preventDefault();
