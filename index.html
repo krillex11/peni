@@ -54,12 +54,12 @@
 
 <script type="module">
 
-
- import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    // Импорт Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-
-     const firebaseConfig = {
+    // 🔴 ВСТАВЬ СВОИ КЛЮЧИ ИЗ FIREBASE
+   const firebaseConfig = {
   apiKey: "AIzaSyAe3wXHHBp8IgWs2JOntVbpWGpMrgr8O14",
   authDomain: "nnnn-68466.firebaseapp.com",
   projectId: "nnnn-68466",
@@ -67,34 +67,31 @@
   messagingSenderId: "428383704835",
   appId: "1:428383704835:web:8150208bf3a676bc823b36",
   measurementId: "G-326S3VW9PC"
-};
+};;
 
+    // Инициализация
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+    // Функция отправки
+    window.sendData = async function () {
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
 
-document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const nameInput = document.getElementById("userName").value;
-    const emailInput = document.getElementById("userEmail").value;
-
-    try {
-       
+      try {
         await addDoc(collection(db, "requests"), {
-            name: nameInput,
-            email: emailInput,
-            createdAt: new Date()
+          name: name,
+          email: email,
+          created: new Date()
         });
 
-            alert("Готово! Данные сохранены в Firebase.");
-            document.getElementById("feedbackForm").reset();
-        } catch (error) {
-            console.error("Ошибка записи: ", error);
-            alert("Ошибка при отправке.");
-        }
-    });
-</script>
+        alert("Данные успешно отправлены!");
+      } catch (error) {
+        alert("Ошибка: " + error);
+      }
+    }
+
+  </script>
 </body>
 </html>
 
