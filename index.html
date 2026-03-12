@@ -1,75 +1,94 @@
 <!DOCTYPE html>
-<html lang="ru">
-
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Firebase App</title>
+<title>Firebase Messenger</title>
 
 <style>
 
 body{
-font-family: Arial;
-background: linear-gradient(135deg,#667eea,#764ba2);
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
+font-family:Arial;
 margin:0;
+background:#f2f2f2;
 }
 
-.container{
+.app{
+display:flex;
+height:100vh;
+}
+
+.users{
+width:30%;
 background:white;
-padding:40px;
-border-radius:10px;
-box-shadow:0 10px 25px rgba(0,0,0,0.2);
-width:350px;
-text-align:center;
+border-right:1px solid #ddd;
+overflow:auto;
 }
 
-h1{
-margin-bottom:20px;
+.users h3{
+padding:15px;
+margin:0;
+background:#3498db;
+color:white;
 }
 
-button{
-padding:10px 20px;
-border:none;
-border-radius:6px;
+.user{
+padding:10px;
 cursor:pointer;
-margin:5px;
-font-size:14px;
+border-bottom:1px solid #eee;
+}
+
+.user:hover{
+background:#f5f5f5;
+}
+
+.chat{
+flex:1;
+display:flex;
+flex-direction:column;
+}
+
+.messages{
+flex:1;
+padding:20px;
+overflow:auto;
+}
+
+.msg{
+margin:10px 0;
+}
+
+.me{
+text-align:right;
+}
+
+.input{
+display:flex;
+padding:10px;
+background:white;
+border-top:1px solid #ddd;
+}
+
+.input input{
+flex:1;
+padding:10px;
+border:1px solid #ccc;
+border-radius:5px;
+}
+
+.input button{
+margin-left:10px;
+padding:10px 20px;
+background:#2ecc71;
+border:none;
+color:white;
+border-radius:5px;
+cursor:pointer;
 }
 
 .login{
-background:#4285F4;
-color:white;
-}
-
-.logout{
-background:#e74c3c;
-color:white;
-}
-
-.send{
-background:#2ecc71;
-color:white;
-}
-
-.upload{
-background:#f39c12;
-color:white;
-}
-
-input{
-width:90%;
-padding:10px;
-margin:10px 0;
-border-radius:6px;
-border:1px solid #ccc;
-}
-
-#form{
-display:none;
-margin-top:20px;
+position:absolute;
+top:20px;
+left:20px;
 }
 
 </style>
@@ -78,24 +97,23 @@ margin-top:20px;
 
 <body>
 
-<div class="container">
-
-<h1>Firebase Chat</h1>
-
 <button id="login" class="login">Войти через Google</button>
-<button id="logout" class="logout">Выйти</button>
 
-<div id="form">
+<div class="app">
 
-<input id="message" placeholder="Введите сообщение">
+<div class="users">
+<h3>Пользователи</h3>
+<div id="userList"></div>
+</div>
 
-<button id="send" class="send">Отправить сообщение</button>
+<div class="chat">
 
-<hr>
+<div id="messages" class="messages"></div>
 
-<input type="file" id="image">
-
-<button id="upload" class="upload">Загрузить картинку</button>
+<div class="input">
+<input id="messageInput" placeholder="Сообщение">
+<button id="send">Отправить</button>
+</div>
 
 </div>
 
@@ -105,25 +123,23 @@ margin-top:20px;
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
 
-import { 
+import {
 getAuth,
 GoogleAuthProvider,
 signInWithPopup,
-signOut,
 onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
 import {
 getFirestore,
 collection,
-addDoc
+addDoc,
+setDoc,
+doc,
+getDocs,
+query,
+onSnapshot
 } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-
-import {
-getStorage,
-ref,
-uploadBytes
-} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
 
 
 const firebaseConfig = {
@@ -135,97 +151,139 @@ const firebaseConfig = {
   appId: "1:559983149303:web:18d360a1775d3a81e4d3f2",
   measurementId: "G-HKR3DZYVD8"
 };
-const app = initializeApp(firebaseConfig);
+const app=initializeApp(firebaseConfig);
 
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
+const auth=getAuth(app);
+const db=getFirestore(app);
 
-const provider = new GoogleAuthProvider();
+const provider=new GoogleAuthProvider();
+
+let currentUser=null;
+let selectedUser=null;
 
 
-document.getElementById("login").onclick = () => {
+login.onclick=()=>{
 
 signInWithPopup(auth,provider);
 
 };
 
-document.getElementById("logout").onclick = () => {
 
-signOut(auth);
-
-};
-
-
-onAuthStateChanged(auth,(user)=>{
+onAuthStateChanged(auth,async(user)=>{
 
 if(user){
 
-document.getElementById("form").style.display="block";
+currentUser=user;
 
-}else{
+await setDoc(doc(db,"users",user.uid),{
 
-document.getElementById("form").style.display="none";
+email:user.email,
+name:user.displayName
+
+});
+
+loadUsers();
 
 }
 
 });
 
 
-document.getElementById("send").onclick = async ()=>{
+async function loadUsers(){
 
-const text=document.getElementById("message").value;
+const querySnapshot=await getDocs(collection(db,"users"));
 
-try{
+userList.innerHTML="";
+
+querySnapshot.forEach((docu)=>{
+
+const data=docu.data();
+
+if(data.email!=currentUser.email){
+
+const div=document.createElement("div");
+
+div.className="user";
+
+div.innerText=data.name;
+
+div.onclick=()=>{
+
+selectedUser=data.email;
+
+loadMessages();
+
+};
+
+userList.appendChild(div);
+
+}
+
+});
+
+}
+
+
+function loadMessages(){
+
+const q=query(collection(db,"messages"));
+
+onSnapshot(q,(snapshot)=>{
+
+messages.innerHTML="";
+
+snapshot.forEach((doc)=>{
+
+const data=doc.data();
+
+if(
+(data.from==currentUser.email && data.to==selectedUser)||
+(data.from==selectedUser && data.to==currentUser.email)
+){
+
+const div=document.createElement("div");
+
+div.className="msg";
+
+if(data.from==currentUser.email){
+
+div.classList.add("me");
+
+}
+
+div.innerText=data.text;
+
+messages.appendChild(div);
+
+}
+
+});
+
+});
+
+}
+
+
+send.onclick=async()=>{
+
+const text=messageInput.value;
+
+if(!selectedUser) return;
 
 await addDoc(collection(db,"messages"),{
 
+from:currentUser.email,
+to:selectedUser,
 text:text,
 date:Date.now()
 
 });
 
-alert("Сообщение отправлено");
-
-}catch(e){
-
-alert("Ошибка: "+e);
-
-}
-
-};
-
-
-document.getElementById("upload").onclick = async ()=>{
-
-const file=document.getElementById("image").files[0];
-
-if(!file){
-
-alert("Выберите файл");
-
-return;
-
-}
-
-const storageRef = ref(storage,"images/"+file.name);
-
-try{
-
-await uploadBytes(storageRef,file);
-
-alert("Картинка загружена");
-
-}catch(e){
-
-alert("Ошибка загрузки");
-
-}
+messageInput.value="";
 
 };
 
 </script>
 
 </body>
-
 </html>
