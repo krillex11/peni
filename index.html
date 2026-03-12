@@ -59,6 +59,8 @@ margin:10px 0;
 
 .me{
 text-align:right;
+color:#2c3e50;
+font-weight:bold;
 }
 
 .input{
@@ -138,19 +140,19 @@ setDoc,
 doc,
 getDocs,
 query,
-onSnapshot
+onSnapshot,
+orderBy
 } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-
 const firebaseConfig = {
-  apiKey: "AIzaSyDeTACUBfB-XWhgtTtYqwavqHOkPcvLvTM",
-  authDomain: "krillex-a57aa.firebaseapp.com",
-  projectId: "krillex-a57aa",
-  storageBucket: "krillex-a57aa.firebasestorage.app",
-  messagingSenderId: "559983149303",
-  appId: "1:559983149303:web:18d360a1775d3a81e4d3f2",
-  measurementId: "G-HKR3DZYVD8"
+apiKey:"AIzaSyDeTACUBfB-XWhgtTtYqwavqHOkPcvLvTM",
+authDomain:"krillex-a57aa.firebaseapp.com",
+projectId:"krillex-a57aa",
+storageBucket:"krillex-a57aa.firebasestorage.app",
+messagingSenderId:"559983149303",
+appId:"1:559983149303:web:18d360a1775d3a81e4d3f2"
 };
+
 const app=initializeApp(firebaseConfig);
 
 const auth=getAuth(app);
@@ -158,16 +160,19 @@ const db=getFirestore(app);
 
 const provider=new GoogleAuthProvider();
 
+const loginBtn=document.getElementById("login");
+const userList=document.getElementById("userList");
+const messages=document.getElementById("messages");
+const sendBtn=document.getElementById("send");
+const messageInput=document.getElementById("messageInput");
+
 let currentUser=null;
 let selectedUser=null;
+let unsubscribe=null;
 
-
-login.onclick=()=>{
-
+loginBtn.onclick=()=>{
 signInWithPopup(auth,provider);
-
 };
-
 
 onAuthStateChanged(auth,async(user)=>{
 
@@ -176,10 +181,8 @@ if(user){
 currentUser=user;
 
 await setDoc(doc(db,"users",user.uid),{
-
 email:user.email,
 name:user.displayName
-
 });
 
 loadUsers();
@@ -188,23 +191,20 @@ loadUsers();
 
 });
 
-
 async function loadUsers(){
 
-const querySnapshot=await getDocs(collection(db,"users"));
+const snapshot=await getDocs(collection(db,"users"));
 
 userList.innerHTML="";
 
-querySnapshot.forEach((docu)=>{
+snapshot.forEach((d)=>{
 
-const data=docu.data();
+const data=d.data();
 
 if(data.email!=currentUser.email){
 
 const div=document.createElement("div");
-
 div.className="user";
-
 div.innerText=data.name;
 
 div.onclick=()=>{
@@ -223,18 +223,22 @@ userList.appendChild(div);
 
 }
 
-
 function loadMessages(){
 
-const q=query(collection(db,"messages"));
+if(unsubscribe) unsubscribe();
 
-onSnapshot(q,(snapshot)=>{
+const q=query(
+collection(db,"messages"),
+orderBy("date")
+);
+
+unsubscribe=onSnapshot(q,(snapshot)=>{
 
 messages.innerHTML="";
 
-snapshot.forEach((doc)=>{
+snapshot.forEach((d)=>{
 
-const data=doc.data();
+const data=d.data();
 
 if(
 (data.from==currentUser.email && data.to==selectedUser)||
@@ -246,9 +250,7 @@ const div=document.createElement("div");
 div.className="msg";
 
 if(data.from==currentUser.email){
-
 div.classList.add("me");
-
 }
 
 div.innerText=data.text;
@@ -259,16 +261,17 @@ messages.appendChild(div);
 
 });
 
+messages.scrollTop=messages.scrollHeight;
+
 });
 
 }
 
+sendBtn.onclick=async()=>{
 
-send.onclick=async()=>{
+const text=messageInput.value.trim();
 
-const text=messageInput.value;
-
-if(!selectedUser) return;
+if(!text || !selectedUser) return;
 
 await addDoc(collection(db,"messages"),{
 
