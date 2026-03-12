@@ -2,14 +2,14 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Firebase Messenger</title>
+<title>Firebase Chat</title>
 
 <style>
 
 body{
-font-family:Arial;
 margin:0;
-background:#f2f2f2;
+font-family:Arial;
+background:#eceff1;
 }
 
 .app{
@@ -18,21 +18,20 @@ height:100vh;
 }
 
 .users{
-width:30%;
+width:280px;
 background:white;
 border-right:1px solid #ddd;
-overflow:auto;
 }
 
 .users h3{
-padding:15px;
 margin:0;
-background:#3498db;
+padding:15px;
+background:#2c3e50;
 color:white;
 }
 
 .user{
-padding:10px;
+padding:12px;
 cursor:pointer;
 border-bottom:1px solid #eee;
 }
@@ -49,18 +48,26 @@ flex-direction:column;
 
 .messages{
 flex:1;
-padding:20px;
 overflow:auto;
+padding:20px;
 }
 
-.msg{
-margin:10px 0;
+.bubble{
+max-width:60%;
+padding:10px 15px;
+border-radius:15px;
+margin:8px 0;
 }
 
 .me{
-text-align:right;
-color:#2c3e50;
-font-weight:bold;
+background:#2ecc71;
+color:white;
+margin-left:auto;
+}
+
+.other{
+background:white;
+border:1px solid #ddd;
 }
 
 .input{
@@ -80,8 +87,8 @@ border-radius:5px;
 .input button{
 margin-left:10px;
 padding:10px 20px;
-background:#2ecc71;
 border:none;
+background:#3498db;
 color:white;
 border-radius:5px;
 cursor:pointer;
@@ -91,6 +98,11 @@ cursor:pointer;
 position:absolute;
 top:20px;
 left:20px;
+padding:10px 20px;
+background:#e74c3c;
+color:white;
+border:none;
+cursor:pointer;
 }
 
 </style>
@@ -148,7 +160,7 @@ const firebaseConfig = {
 apiKey:"AIzaSyDeTACUBfB-XWhgtTtYqwavqHOkPcvLvTM",
 authDomain:"krillex-a57aa.firebaseapp.com",
 projectId:"krillex-a57aa",
-storageBucket:"krillex-a57aa.firebasestorage.app",
+storageBucket:"krillex-a57aa.appspot.com",
 messagingSenderId:"559983149303",
 appId:"1:559983149303:web:18d360a1775d3a81e4d3f2"
 };
@@ -160,57 +172,60 @@ const db=getFirestore(app);
 
 const provider=new GoogleAuthProvider();
 
+let currentUser=null;
+let selectedUser=null;
+let unsubscribe=null;
+
 const loginBtn=document.getElementById("login");
 const userList=document.getElementById("userList");
 const messages=document.getElementById("messages");
 const sendBtn=document.getElementById("send");
 const messageInput=document.getElementById("messageInput");
 
-let currentUser=null;
-let selectedUser=null;
-let unsubscribe=null;
-
 loginBtn.onclick=()=>{
-signInWithPopup(auth,provider);
+
+signInWithPopup(auth,provider)
+.catch(e=>alert(e.message));
+
 };
 
 onAuthStateChanged(auth,async(user)=>{
 
-if(user){
+if(!user) return;
 
 currentUser=user;
 
 await setDoc(doc(db,"users",user.uid),{
+
 email:user.email,
 name:user.displayName
+
 });
 
 loadUsers();
-
-}
 
 });
 
 async function loadUsers(){
 
-const snapshot=await getDocs(collection(db,"users"));
+const snap=await getDocs(collection(db,"users"));
 
 userList.innerHTML="";
 
-snapshot.forEach((d)=>{
+snap.forEach(d=>{
 
 const data=d.data();
 
-if(data.email!=currentUser.email){
+if(data.email!==currentUser.email){
 
 const div=document.createElement("div");
+
 div.className="user";
 div.innerText=data.name;
 
 div.onclick=()=>{
 
 selectedUser=data.email;
-
 loadMessages();
 
 };
@@ -236,21 +251,27 @@ unsubscribe=onSnapshot(q,(snapshot)=>{
 
 messages.innerHTML="";
 
-snapshot.forEach((d)=>{
+snapshot.forEach(d=>{
 
 const data=d.data();
 
 if(
-(data.from==currentUser.email && data.to==selectedUser)||
-(data.from==selectedUser && data.to==currentUser.email)
+(data.from===currentUser.email && data.to===selectedUser)||
+(data.from===selectedUser && data.to===currentUser.email)
 ){
 
 const div=document.createElement("div");
 
-div.className="msg";
+div.className="bubble";
 
-if(data.from==currentUser.email){
+if(data.from===currentUser.email){
+
 div.classList.add("me");
+
+}else{
+
+div.classList.add("other");
+
 }
 
 div.innerText=data.text;
